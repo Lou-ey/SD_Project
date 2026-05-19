@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7aaccaa3-906b-4a19-b390-70adb4d8c4a5" name="Changes" comment="" />
+    <list default="true" id="7aaccaa3-906b-4a19-b390-70adb4d8c4a5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/server/ServerMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/server/logic/BlackjackTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/server/model/Card.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/server/model/Deck.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/server/model/Player.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/server/network/ClientManager.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="server" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -53,6 +60,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "master",
+    "git.auto.fetch.suggestion.counter": "1",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
@@ -71,7 +79,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1779221902104</updated>
-      <workItem from="1779221903176" duration="910000" />
+      <workItem from="1779221903176" duration="1469000" />
     </task>
     <servers />
   </component>
