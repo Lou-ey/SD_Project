@@ -80,4 +80,8 @@ public class ClientHandler implements Runnable {
             System.out.println("Error sending message to client: " + username);
         }
     }
+
+    public String getUsername() {
+        return username;
+    }
 }
