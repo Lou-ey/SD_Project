@@ -10,12 +10,37 @@ import java.util.Queue;
 
 public class BlackjackTable {
     private static final int MAX_PLAYERS = 3;
-    private Player[] playing = new Player[MAX_PLAYERS];
+    private Player[] playingNow = new Player[MAX_PLAYERS];
     private List<ClientHandler> allClients = new ArrayList<>();
-    private Queue<ClientHandler> spectators = new LinkedList<>();
+    private Queue<Player> spectators = new LinkedList<>();
 
     public BlackjackTable() {
     }
 
+    public boolean addPlayer(String name, ClientHandler handler) {
+        if (nameExists(name)) {
+            return false;
+        }
 
+        Player newPlayer = new Player(name, handler);
+        allClients.add(handler);
+
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if (playingNow[i] == null) { // procurar lugar vazio
+                playingNow[i] = newPlayer;
+                // enviar mensagem para todos
+                break;
+            }
+        }
+        return true;
+    }
+
+    public boolean nameExists(String name) {
+        for (Player player : playingNow) {
+            if (player.getNome().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

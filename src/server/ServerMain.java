@@ -1,11 +1,8 @@
 package server;
 
-import server.network.ClientHandler;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Queue;
 
 public class ServerMain {
     private static int port = 4089;
