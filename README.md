@@ -1,0 +1,1 @@
+O binex é um cao fraco.
