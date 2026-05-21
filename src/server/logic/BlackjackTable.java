@@ -20,6 +20,8 @@ public class BlackjackTable {
 
     private List<Card> dealerHand = new ArrayList<>();
 
+    private boolean inRound = false;
+
     public BlackjackTable() {
         for (int i = 0; i < MAX_PLAYERS; i++) {
             playingNow[i] = null; // inicializar a mesa sem jogadores
@@ -38,14 +40,14 @@ public class BlackjackTable {
             if (playingNow[i] == null) { // procurar lugar vazio
                 playingNow[i] = newPlayer;
                 canSit = true;
-                sendMessageToAll("JOIN: " + name + " joined the table and took a seat.");
+                sendMessageToAll("JOIN:" + name + " joined the table and took a seat.");
                 break;
             }
         }
 
         if (!canSit) {
             waitingQueue.add(newPlayer);
-            sendMessageToAll("WAIT: " + name + " joined the table as spectator. Position: " + waitingQueue.size());
+            sendMessageToAll("WAIT:" + name + " joined the table as spectator. Position: " + waitingQueue.size());
         }
         return true; // se o nome do jogador já existe, retorna false. Caso contrário, adiciona o jogador e retorna true.
     }
@@ -66,7 +68,7 @@ public class BlackjackTable {
             if (playingNow[i] != null && playingNow[i].getNome().equals(name)) { // se a posicao na mesa nao for nula e o nome do jogador for igual ao nome recebido
                 playingNow[i] = null;
                 wasPlaying = true;
-                sendMessageToAll("EXIT: " + name + " left the table.");
+                sendMessageToAll("EXIT:" + name + " left the table.");
                 break;
             }
         }
@@ -77,7 +79,7 @@ public class BlackjackTable {
                 Player player = itWaiting.next();
                 if (player.getNome().equals(name)) {
                     itWaiting.remove();
-                    sendMessageToAll("EXIT: " + name + " left the table.");
+                    sendMessageToAll("EXIT:" + name + " left the table.");
                     break;
                 }
             }
@@ -110,8 +112,54 @@ public class BlackjackTable {
             if (playingNow[i] == null && !waitingQueue.isEmpty()) {
                 Player next = waitingQueue.poll();
                 next.setFichas(10);
-                sendMessageToAll("NEW_PLAYER: " + next.getNome() + " is now playing at the table.");
+                sendMessageToAll("NEW_PLAYER:" + next.getNome() + " is now playing at the table.");
             }
         }
+    }
+
+    public void beginRound() {
+        if (inRound) {
+            return;
+        }
+
+        sendMessageToAll("BEGIN:A new round is starting!");
+
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            Player player = playingNow[i];
+            if (player != null) {
+                if (player.getFichas() < 2) {
+                    sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " does not have enough chips to play and will be removed from the table.");}
+                    removePlayer(player.getNome());
+                } else {
+                    player.setFichas(player.getFichas() - 2); // descontar as fichas para jogar
+                    sendMessageToAll("ROUND_START:" + player.getNome() + " has joined the round with 2 chips.");
+            }
+        }
+
+        deck.shuffle();
+        dealerHand.clear();
+        inRound = true;
+
+        for (int volta = 0; volta < 2; volta++) { // for para dar as 2 cartas iniciais a cada jogador e ao dealer
+            for (int i = 1; i < MAX_PLAYERS; i++) {
+                Player player = playingNow[i];
+
+                if (player != null) {
+                    Card card = deck.deal();
+                    player.addCard(card);
+                    sendMessageToAll("PLAYER_CARD:" + player.getNome() + " received " + card.getName() + ".");
+                }
+            }
+
+            Card dealerCard = deck.deal();
+            dealerHand.add(dealerCard);
+            if (volta == 0) {
+                sendMessageToAll("DEALER_CARD:Dealer received " + dealerCard.getName() + " (face up).");
+            } else {
+                sendMessageToAll("DEALER_CARD:bv"); // bv é o asset da carta virada para baixo no cliente (bv = back view)
+            }
+        }
+
+        sendMessageToAll("INFO:Cards have been dealt.");
     }
 }

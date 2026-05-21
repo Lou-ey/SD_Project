@@ -8,13 +8,13 @@ import java.util.List;
 public class Player {
     private String nome;
     private int fichas;
-    private List<Card> mao;
+    private List<Card> hand;
     private ClientHandler clientHandler;
 
     public Player(String nome, ClientHandler clientHandler) {
         this.nome = nome;
         this.fichas = 10;
-        this.mao = new ArrayList<>();
+        this.hand = new ArrayList<>();
         this.clientHandler = clientHandler;
     }
 
@@ -43,10 +43,37 @@ public class Player {
     }
 
     public List<Card> getMao() {
-        return mao;
+        return hand;
     }
 
     public void setMao(List<Card> mao) {
-        this.mao = mao;
+        this.hand = mao;
+    }
+
+    public void addCard(Card card){
+        hand.add(card);
+    }
+
+    public void clearMao(){
+        hand.clear();
+    }
+
+    public int calculateHandValue() {
+        int total = 0;
+        int aces = 0;
+
+        for (Card card : hand) {
+            total += card.getValue();
+
+            if (card.getName().endsWith("1")) {
+                aces++;
+            }
+
+            while(total > 21 && aces > 0) {
+                total -= 10;
+                aces--;
+            }
+        }
+        return total;
     }
 }
