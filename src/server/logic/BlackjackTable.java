@@ -115,8 +115,8 @@ public class BlackjackTable {
 
     private void putSpectatorToTable() {
         for (int i = 0; i < MAX_PLAYERS; i++) {
-            if (playingNow[i] == null && !waitingQueue.isEmpty()) {
-                Player next = waitingQueue.poll();
+            if (playingNow[i] == null && !waitingQueue.isEmpty()) {//se tiver um lugar vazio e se houver pessoas a espera
+                Player next = waitingQueue.poll();//pessoa que esta a frente na fila
                 next.setFichas(10);
                 sendMessageToAll("NEW_PLAYER:" + next.getNome() + " is now playing at the table.");
             }
@@ -124,20 +124,21 @@ public class BlackjackTable {
     }
 
     public void beginRound() {
-        if (inRound) {
+        if (inRound) {//se ainda tiver a correr a ronda
             return;
         }
 
         sendMessageToAll("BEGIN:A new round is starting!");
 
-        for (int i = 0; i < MAX_PLAYERS; i++) {
+        for (int i = 0; i < MAX_PLAYERS; i++) {//ver em cada player se da para jogar ou nao
             Player player = playingNow[i];
+
             if (player != null) {
-                if (player.getFichas() < 2) {
+                if (player.getFichas() < 2) {//se tem pelo menos 2 fichas
                     sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " does not have enough chips to play and will be removed from the table.");
                     removePlayer(player.getNome());
-                    // nao tenho a certeza se o player removido tem de passar para espetador ou ser completamente removido da mesa
-                    // waitingQueue.add(player);
+                    waitingQueue.add(player);//o player passou a espetador
+
                 } else {
                     player.setFichas(player.getFichas() - 2); // descontar as fichas para jogar
                     sendMessageToAll("ROUND_START:" + player.getNome() + " has joined the round with 2 chips.");
@@ -175,7 +176,7 @@ public class BlackjackTable {
     public void passarTurno() {
         turnoJogador++;
 
-        while (turnoJogador < MAX_PLAYERS) {
+        while (turnoJogador < MAX_PLAYERS) { //jogadores [0,1,2]
             Player player = playingNow[turnoJogador];
 
             if (player != null) {
@@ -192,7 +193,7 @@ public class BlackjackTable {
 
     public void requestHit(String playerName) {
 
-        if (turnoJogador == -1 || turnoJogador >= MAX_PLAYERS) {
+        if (turnoJogador == -1 || turnoJogador >= MAX_PLAYERS) { //se nao for ele a jogar
             return;
         }
 
@@ -302,18 +303,26 @@ public class BlackjackTable {
                 if (playerHandValue > 21) {
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " busted and loses with a hand value of " + playerHandValue + "! Current chips: " + currentPlayer.getFichas());
                     // como as fichas já foram descontadas no início da rodada, não é necessário fazer nada aqui para retirar fichas do jogador
+
                 } else if (playerHasBlackjack && !dealerHasBlackjack) {
                     currentPlayer.setFichas(currentPlayer.getFichas() + 5); // Blackjack natural recebe 3:2, ou seja, o jogador recebe 5 fichas (2 fichas da aposta + 3 fichas de lucro)
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " wins with a Blackjack and receives 5 chips! Current chips: " + currentPlayer.getFichas());
+
                 } else if (playerHasBlackjack && dealerHasBlackjack) {
                     currentPlayer.setFichas(currentPlayer.getFichas() + 2); // empate com Blackjack, o jogador recebe o valor da aposta de volta (2 fichas)
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " ties with the dealer with a Blackjack and receives 2 chips back. Current chips: " + currentPlayer.getFichas());
+
                 } else if (dealerBusted) {
                     currentPlayer.setFichas(currentPlayer.getFichas() + 4); // vitoria normal recebe 1:1, ou seja, o jogador recebe 4 fichas (2 fichas da aposta + 2 fichas de lucro)
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " wins as the dealer busted and receives 4 chips! Current chips: " + currentPlayer.getFichas());
+
                 } else if (playerHandValue == dealerHandValue) {
                     currentPlayer.setFichas(currentPlayer.getFichas() + 2); // empate normal, o jogador recebe o valor da aposta de volta (2 fichas)
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " ties with the dealer and receives 2 chips back. Current chips: " + currentPlayer.getFichas());
+
+                } else if (playerHandValue > dealerHandValue){ //se nos tivermos mais que o dealer mas nao for blackjack
+                    sendMessageToAll("RESULT:" + currentPlayer.getNome() + " recebeu duas fichas de volta. Fichas: " + currentPlayer.getFichas());
+
                 } else { // se os pontos do jogador forem menores que os do dealer, o jogador perde a aposta
                     sendMessageToAll("RESULT:" + currentPlayer.getNome() + " loses with a hand value of " + playerHandValue + " against the dealer's " + dealerHandValue + ". Current chips: " + currentPlayer.getFichas());
                 }

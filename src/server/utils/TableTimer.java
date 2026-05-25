@@ -12,6 +12,7 @@ public class TableTimer implements Runnable {
         this.seconds = seconds;
         this.timerType = type;
         this.running = true;
+        this.blackjackTable = blackjackTable;
     }
 
     @Override
