@@ -11,9 +11,9 @@ import java.util.*;
 
 public class BlackjackTable {
     private static final int MAX_PLAYERS = 3;
-    private Player[] playingNow = new Player[MAX_PLAYERS];
-    private List<ClientHandler> allClients = new ArrayList<>();
-    private Queue<Player> waitingQueue = new LinkedList<>();
+    private Player[] playingNow = new Player[MAX_PLAYERS]; // array para armazenar os jogadores que estao atualmente a jogar na mesa, o índice do array representa a posição do jogador na mesa (0, 1 ou 2)
+    private List<ClientHandler> allClients = new ArrayList<>(); // lista de todos os clientes conectados, usada para enviar mensagens para todos os clientes
+    private Queue<Player> waitingQueue = new LinkedList<>(); // fila de espera para jogadores que tentam entrar quando a mesa já está cheia
 
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss"); // variavel para formatar a hora
 
@@ -26,7 +26,7 @@ public class BlackjackTable {
     private TableTimer currentTimer = null;
     private Thread timerThread = null;
 
-    private int turnoJogador = -1;
+    private int turnoJogador = -1; // variável para controlar o turno dos jogadores, começa em -1 para indicar que ainda não começou a rodada
 
     public BlackjackTable() {
         for (int i = 0; i < MAX_PLAYERS; i++) {
@@ -59,7 +59,7 @@ public class BlackjackTable {
     }
 
     public void removePlayer(String name) {
-        // como em java nao é possivel remover um elemento de uma lista enquanto se percorre a mesma, é necessário usar um iterador para evitar o ConcurrentModificationException
+        // como em java nao é possivel remover um elemento de uma lista enquanto se percorre a mesma, é necessário usar um iterador
         Iterator<ClientHandler> itClients = allClients.iterator(); // iterador para percorrer a lista de clientes para podermos remover durante o loop
         while (itClients.hasNext()) { // enquanto houver clientes na lista
             ClientHandler clientHandler = itClients.next(); // obter o handler do cliente
@@ -134,11 +134,14 @@ public class BlackjackTable {
             Player player = playingNow[i];
             if (player != null) {
                 if (player.getFichas() < 2) {
-                    sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " does not have enough chips to play and will be removed from the table.");}
+                    sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " does not have enough chips to play and will be removed from the table.");
                     removePlayer(player.getNome());
+                    // nao tenho a certeza se o player removido tem de passar para espetador ou ser completamente removido da mesa
+                    // waitingQueue.add(player);
                 } else {
                     player.setFichas(player.getFichas() - 2); // descontar as fichas para jogar
                     sendMessageToAll("ROUND_START:" + player.getNome() + " has joined the round with 2 chips.");
+                }
             }
         }
 
@@ -146,8 +149,8 @@ public class BlackjackTable {
         dealerHand.clear();
         inRound = true;
 
-        for (int volta = 0; volta < 2; volta++) { // for para dar as 2 cartas iniciais a cada jogador e ao dealer
-            for (int i = 1; i < MAX_PLAYERS; i++) {
+        for (int volta = 0; volta < 2; volta++) { // ciclo for para dar as 2 cartas iniciais a cada jogador e ao dealer
+            for (int i = 1; i < MAX_PLAYERS; i++) { //
                 Player player = playingNow[i];
 
                 if (player != null) {
@@ -184,6 +187,7 @@ public class BlackjackTable {
             turnoJogador++;
         }
         // se saiu do loop quer dizer que todos jogaram e é a vez do dealer jogar
+        dealerTurn();
     }
 
     public void requestHit(String playerName) {
@@ -276,6 +280,7 @@ public class BlackjackTable {
             sendMessageToAll("DEALER_STAND:Dealer stands with a hand value of " + dealerHandValue + ".");
         }
         // aqui vai o metodo para comparar as maos dos jogadores com a do dealer
+        calculateResults();
     }
 
     private void calculateResults() {
