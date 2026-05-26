@@ -19,7 +19,7 @@ public class ServerConThread extends Thread {
 
     private TableFrame tableFrame;
 
-    public ServerConThread(int port, String ip) {
+    public ServerConThread(String ip, int port) {
         this.port = port;
         this.ip = ip;
         this.connected = false;
@@ -48,7 +48,7 @@ public class ServerConThread extends Thread {
         } catch (Exception e) {
             System.out.println("Connection lost: " + e.getMessage());
         } finally {
-
+            disconnect();
         }
     }
 
@@ -76,7 +76,12 @@ public class ServerConThread extends Thread {
     }
 
     public void sendCommand(String command) {
-
+        try {
+            out.writeUTF(command);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void disconnect() {
@@ -94,5 +99,9 @@ public class ServerConThread extends Thread {
         } catch (IOException e) {
             System.out.println("Error closing connection: " + e.getMessage());
         }
+    }
+
+    public void setTableFrame(TableFrame tableFrame) {
+        this.tableFrame = tableFrame;
     }
 }
