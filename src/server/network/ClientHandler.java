@@ -51,7 +51,7 @@ public class ClientHandler implements Runnable {
                             sendMessage("LOGIN_SUCCESS:Bem-vindo, " + name + "!");
                             break;
                         } else {
-                            sendMessage("LOGIN_FAILED:Nome de utilizador já existe ou mesa cheia!");
+                            sendMessage("LOGIN_FAILED:Nome de utilizador já existe!");
                         }
                         break;
                     case "HIT":

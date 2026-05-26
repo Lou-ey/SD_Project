@@ -46,51 +46,51 @@ public class BlackjackTable {
             if (playingNow[i] == null) { // procurar lugar vazio
                 playingNow[i] = newPlayer;
                 canSit = true;
-                sendMessageToAll("JOIN:" + name + " joined the table and took a seat.");
+                sendMessageToAll("JOIN:" + name + " juntou-se à mesa.");
                 break;
             }
         }
 
         if (!canSit) {
             waitingQueue.add(newPlayer);
-            sendMessageToAll("WAIT:" + name + " joined the table as spectator. Position: " + waitingQueue.size());
+            sendMessageToAll("WAIT:" + name + " juntou-se a lista de espera. Posição: " + waitingQueue.size());
         }
         return true; // se o nome do jogador já existe, retorna false. Caso contrário, adiciona o jogador e retorna true.
     }
 
     public void removePlayer(String name) {
-        // como em java nao é possivel remover um elemento de uma lista enquanto se percorre a mesma, é necessário usar um iterador
-        Iterator<ClientHandler> itClients = allClients.iterator(); // iterador para percorrer a lista de clientes para podermos remover durante o loop
-        while (itClients.hasNext()) { // enquanto houver clientes na lista
-            ClientHandler clientHandler = itClients.next(); // obter o handler do cliente
-            if (clientHandler.getUsername() != null && clientHandler.getUsername().equals(name)) {
-                itClients.remove();
+
+        ClientHandler clientToRemove = null;
+        for (ClientHandler c : allClients) { //remover da lista de todos
+            if (c.getUsername() != null && c.getUsername().equals(name)) {
+                clientToRemove = c;
                 break;
             }
         }
+        allClients.remove(clientToRemove);
 
         boolean wasPlaying = false;
-        for (int i = 0; i < MAX_PLAYERS; i++) { // vai percorrer os jogadores a jogar
+        for (int i = 0; i < MAX_PLAYERS; i++) { //ver se estava a jogar
             if (playingNow[i] != null && playingNow[i].getNome().equals(name)) { // se a posicao na mesa nao for nula e o nome do jogador for igual ao nome recebido
-                playingNow[i] = null;
+                playingNow[i] = null; //meter o lugar dele vazio
                 wasPlaying = true;
-                sendMessageToAll("EXIT:" + name + " left the table.");
+                sendMessageToAll("EXIT:" + name + " saiu da mesa de jogo.");
                 break;
             }
         }
 
-        if (!wasPlaying) {
-            Iterator<Player> itWaiting = waitingQueue.iterator(); // iterador para percorrer a fila de espera para poder remover durante o loop
-            while (itWaiting.hasNext()) {
-                Player player = itWaiting.next();
-                if (player.getNome().equals(name)) {
-                    itWaiting.remove();
-                    sendMessageToAll("EXIT:" + name + " left the table.");
+        if (!wasPlaying) { //nao estava a jogar, estava na lista de espera
+            Player playerToRemove = null;
+            for (Player p : waitingQueue) {
+                if (p.getNome() != null && p.getNome().equals(name)) {
+                    playerToRemove = p;
                     break;
                 }
             }
-        } else { //
-            // metodo de colocar o primeiro da fila de espera a jogar
+            waitingQueue.remove(playerToRemove);
+            sendMessageToAll("EXIT:" + name + " saiu da lista de espera.");
+
+        } else { //estava a jogar entao tem que entrar um novo player
             putSpectatorToTable();
         }
     }
@@ -128,20 +128,20 @@ public class BlackjackTable {
             return;
         }
 
-        sendMessageToAll("BEGIN:A new round is starting!");
+        sendMessageToAll("BEGIN:Começou uma nova Ronda!");
 
         for (int i = 0; i < MAX_PLAYERS; i++) {//ver em cada player se da para jogar ou nao
             Player player = playingNow[i];
 
             if (player != null) {
                 if (player.getFichas() < 2) {//se tem pelo menos 2 fichas
-                    sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " does not have enough chips to play and will be removed from the table.");
+                    sendMessageToAll("NOT_ENOUGH_CHIPS:" + player.getNome() + " não tem fichas suficientes para jogar e vai ser removido da mesa.");
                     removePlayer(player.getNome());
                     waitingQueue.add(player);//o player passou a espetador
 
                 } else {
                     player.setFichas(player.getFichas() - 2); // descontar as fichas para jogar
-                    sendMessageToAll("ROUND_START:" + player.getNome() + " has joined the round with 2 chips.");
+                    sendMessageToAll("ROUND_START:" + player.getNome() + " entrou com 2 fichas.");
                 }
             }
         }
@@ -164,13 +164,13 @@ public class BlackjackTable {
             Card dealerCard = deck.deal();
             dealerHand.add(dealerCard);
             if (volta == 0) {
-                sendMessageToAll("DEALER_CARD:Dealer received " + dealerCard.getName() + " (face up).");
+                sendMessageToAll("DEALER_CARD:O Dealer recebeu " + dealerCard.getName() + " (face up).");
             } else {
-                sendMessageToAll("DEALER_CARD:bv"); // bv é o asset da carta virada para baixo no cliente (bv = back view)
+                sendMessageToAll("DEALER_CARD:back view da carta"); // bv é o asset da carta virada para baixo no cliente (bv = back view)
             }
         }
 
-        sendMessageToAll("INFO:Cards have been dealt.");
+        sendMessageToAll("INFO:As cartas foram dadas.");
     }
 
     public void passarTurno() {
@@ -207,10 +207,10 @@ public class BlackjackTable {
 
         Card card = deck.deal();
         currentPlayer.addCard(card);
-        sendMessageToAll("PLAYER_CARD:" + currentPlayer.getNome() + " received " + card.getName() + ".");
+        sendMessageToAll("PLAYER_CARD:" + currentPlayer.getNome() + " recebeu " + card.getName() + ".");
 
         if (currentPlayer.calculateHandValue() > 21) {
-            sendMessageToAll("BUST:" + currentPlayer.getNome() + " has busted!");
+            sendMessageToAll("BUST:" + currentPlayer.getNome() + " fez busted!");
             passarTurno();
         } else {
             startTimer(20, "PLAY");
@@ -229,7 +229,7 @@ public class BlackjackTable {
 
         stopTimer();
 
-        sendMessageToAll("STAND:" + currentPlayer.getNome() + " has chosen to stand with a hand value of " + currentPlayer.calculateHandValue() + ".");
+        sendMessageToAll("STAND:" + currentPlayer.getNome() + " escolheu Stand com uma mao de " + currentPlayer.calculateHandValue() + ".");
 
         passarTurno();
     }
@@ -261,31 +261,31 @@ public class BlackjackTable {
     private void dealerTurn() {
         turnoJogador = -1; // sendo o dealer a jogar o -1 serve para bloquear as ações dos jogadores
 
-        sendMessageToAll("DEALER_TURN:Dealer's turn to play.");
+        sendMessageToAll("DEALER_TURN:Vez do Dealer a jogar.");
         Card downCard = dealerHand.get(1); // carta virada para baixo
-        sendMessageToAll("DEALER_CARD:Dealer's down card is " + downCard.getName() + ".");
+        sendMessageToAll("DEALER_CARD:A carta virava para baixo do Dealer " + downCard.getName() + ".");
 
         int dealerHandValue = calculateHandListValue(dealerHand); // calcular antes de verificar para caso o dealer tenha blackjack
 
         while (dealerHandValue < 17) { // o dealer é obrigado a pedir enquanto tiver uma mao com valor menor que 17
             Card card = deck.deal();
             dealerHand.add(card);
-            sendMessageToAll("DEALER_CARD:Dealer received " + card.getName() + ".");
+            sendMessageToAll("DEALER_CARD:O Dealer recebeu " + card.getName() + ".");
 
             dealerHandValue = calculateHandListValue(dealerHand);
         }
 
         if (dealerHandValue > 21) {
-            sendMessageToAll("DEALER_BUST:Dealer has busted with a hand value of " + dealerHandValue + "!");
+            sendMessageToAll("DEALER_BUST:Dealer fez busted com uma mao de " + dealerHandValue + "!");
         } else {
-            sendMessageToAll("DEALER_STAND:Dealer stands with a hand value of " + dealerHandValue + ".");
+            sendMessageToAll("DEALER_STAND:Dealer fez stand com uma mao de " + dealerHandValue + ".");
         }
         // aqui vai o metodo para comparar as maos dos jogadores com a do dealer
         calculateResults();
     }
 
     private void calculateResults() {
-        sendMessageToAll("RESULTS:Calculating results for the round.");
+        sendMessageToAll("RESULTS:A calcular os resultados da ronda.");
 
         int dealerHandValue = calculateHandListValue(dealerHand);
         boolean dealerBusted = dealerHandValue > 21;
