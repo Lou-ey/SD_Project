@@ -5,9 +5,9 @@ import client.model.CardFrame;
 
 import javax.swing.*;
 import java.util.*;
-/*
-public class TableFrame extends JFrame {
 
+public class TableFrame extends JFrame {
+/*
     private Card card;
     private CardFrame cardLabel;
 
@@ -168,5 +168,5 @@ public class TableFrame extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel TablePanel;
     // End of variables declaration//GEN-END:variables
-
-}*/
+*/
+}
