@@ -1,15 +1,22 @@
 package client.network;
 
+import client.gui.Table;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ServerCon implements Runnable {
     private int port;
     private String ip;
     private DataOutputStream out;
     private DataInputStream in;
+    private Socket socket;
 
     private boolean connected;
+
+    private Table  table;
 
     public ServerCon(int port, String ip, boolean connected) {
         this.port = port;
@@ -17,19 +24,16 @@ public class ServerCon implements Runnable {
         this.connected = connected;
     }
 
-    public void connect() {
-
-        out = new DataOutputStream(System.out);
-        in = new DataInputStream(System.in);
-
+    public boolean connect() {
         try {
-            while (connected) {
-                String msg = in.readUTF();
-                processServerMessage(msg);
-            }
-
+            this.socket = new Socket(ip, port);
+            this.out = new DataOutputStream(socket.getOutputStream());
+            this.in = new DataInputStream(socket.getInputStream());
+            this.connected = true;
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Failed to connect to server: " + e.getMessage());
+            return false;
         }
     }
 
@@ -37,15 +41,52 @@ public class ServerCon implements Runnable {
     public void run() {
         try {
             while (connected) {
-                String msg = in.readUTF();
-                processServerMessage(msg);
+                String serverMessage = in.readUTF();
+                processServerMessage(serverMessage);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Connection lost: " + e.getMessage());
+        } finally {
+
         }
     }
 
     public void processServerMessage(String msg) {
+        System.out.println("Server: " + msg);
 
+        String[] parts = msg.split(":");
+        String command = parts[0];
+
+        switch (command) {
+            case "PLAYER_CARD":
+                break;
+            case "DEALER_CARD":
+                break;
+            case "CHIPS":
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void sendCommand(String command) {
+
+    }
+
+    public void disconnect() {
+        this.connected = false;
+        try {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error closing connection: " + e.getMessage());
+        }
     }
 }
