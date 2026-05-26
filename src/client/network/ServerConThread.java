@@ -1,13 +1,14 @@
 package client.network;
 
-import client.gui.Table;
+import client.gui.TableFrame;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ServerCon implements Runnable {
+
+public class ServerConThread extends Thread {
     private int port;
     private String ip;
     private DataOutputStream out;
@@ -16,12 +17,12 @@ public class ServerCon implements Runnable {
 
     private boolean connected;
 
-    private Table table;
+    private TableFrame tableFrame;
 
-    public ServerCon(int port, String ip, boolean connected) {
+    public ServerConThread(int port, String ip) {
         this.port = port;
         this.ip = ip;
-        this.connected = connected;
+        this.connected = false;
     }
 
     public boolean connect() {
@@ -47,7 +48,7 @@ public class ServerCon implements Runnable {
         } catch (Exception e) {
             System.out.println("Connection lost: " + e.getMessage());
         } finally {
-            disconnect();
+
         }
     }
 
@@ -59,10 +60,15 @@ public class ServerCon implements Runnable {
 
         switch (command) {
             case "PLAYER_CARD":
+                System.out.println(command);
                 break;
             case "DEALER_CARD":
+                System.out.println(command);
+
                 break;
             case "CHIPS":
+                System.out.println(command);
+
                 break;
             default:
                 break;
@@ -70,14 +76,7 @@ public class ServerCon implements Runnable {
     }
 
     public void sendCommand(String command) {
-        if (out != null && connected) {
-            try {
-                out.writeUTF(command);
-                out.flush();
-            } catch (IOException e) {
-                System.out.println("Failed to send command: " + e.getMessage());
-            }
-        }
+
     }
 
     public void disconnect() {
