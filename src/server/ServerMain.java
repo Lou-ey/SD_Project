@@ -6,10 +6,13 @@ import server.network.ClientHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class ServerMain {
-    private static int port = 4089;
     public static void main(String[] args) {
+        System.out.print("Enter the port: ");
+        Scanner sc = new Scanner(System.in);
+        int port = sc.nextInt();
         BlackjackTable table = new BlackjackTable();
         try(ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server listening on port " + port);
