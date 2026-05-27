@@ -32,7 +32,7 @@ public class ClientHandler implements Runnable {
 
             while(true) {
                 String message = in.readUTF();
-                System.out.println("Received: " + message + " from client: " + username);
+                System.out.println("Recebido de " + socket.getInetAddress() + ": " + message);
 
                 // o formato da mensagem é "COMMAND:DATA", onde COMMAND é a ação e DATA é o conteúdo
                 String[] parts = message.split(":", 2);
