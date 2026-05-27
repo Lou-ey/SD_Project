@@ -72,6 +72,7 @@ public class ServerConThread extends Thread {
 
                 break;
             default:
+                tableFrame.addToTextArea(msg);
                 break;
         }
     }
