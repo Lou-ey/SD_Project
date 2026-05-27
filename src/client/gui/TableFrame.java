@@ -75,6 +75,10 @@ public class TableFrame extends JFrame {
 
     }
 
+    private void drawHand() {
+
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JTextArea textArea;
     private JButton btnHit;
