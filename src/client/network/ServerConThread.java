@@ -61,6 +61,7 @@ public class ServerConThread extends Thread {
         switch (command) {
             case "PLAYER_CARD":
                 System.out.println(command);
+
                 break;
             case "DEALER_CARD":
                 System.out.println(command);

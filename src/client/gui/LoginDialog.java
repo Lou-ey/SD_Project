@@ -4,56 +4,58 @@ import client.network.ServerConThread;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginDialog extends JDialog {
-    private JTextField ipTextField;
-    private JTextField portTextField;
-    private JTextField nameTextField;
-    private JButton btnLogin;
 
     public LoginDialog() {
+        initComponents();
+        setLocationRelativeTo(null);
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
+    private void initComponents() {
         setTitle("Login");
         setSize(300,200);
         setModal(true);
         setResizable(false);
+
+        ipLabel = new javax.swing.JLabel();
+        portLabel = new javax.swing.JLabel();
+        nameLabel = new javax.swing.JLabel();
+        ipTextField = new javax.swing.JTextField();
+        portTextField = new javax.swing.JTextField();
+        nameTextField = new javax.swing.JTextField();
+        btnLogin = new javax.swing.JButton();
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
 
-        initComponents();
-    }
+        ipLabel.setText("IP:");
+        ipTextField.setText("localhost");
 
-    private void initComponents() {
+        portLabel.setText("Port:");
+        portTextField.setText("4000");
+
+        nameLabel.setText("Name:");
+
+        btnLogin.setText("Login");
+        btnLogin.addActionListener(this::btnLoginActionPerformed);
+
         JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        panel.add(new JLabel("IP:"));
-        ipTextField = new JTextField("localhost");
+        panel.add(ipLabel);
         panel.add(ipTextField);
-
-        panel.add(new JLabel("Porto:"));
-        portTextField = new JTextField("4000");
+        panel.add(portLabel);
         panel.add(portTextField);
-
-        panel.add(new JLabel("Nome:"));
-        nameTextField = new JTextField();
+        panel.add(nameLabel);
         panel.add(nameTextField);
-
-        panel.add(new JLabel("Login"));
-        btnLogin = new JButton("Login");
         panel.add(btnLogin);
 
         add(panel);
-
-        btnLogin.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                handleLogin();
-            }
-        });
     }
+    // </editor-fold>
 
-    private void handleLogin() {
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
         String ip = ipTextField.getText().trim();
         String portStr = portTextField.getText().trim();
         String name = nameTextField.getText().trim();
@@ -77,7 +79,17 @@ public class LoginDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "Erro ao conectar ao servidor");
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Porto inválida");
+            JOptionPane.showMessageDialog(this, "Porto inválido");
         }
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ipLabel;
+    private javax.swing.JLabel portLabel;
+    private javax.swing.JLabel nameLabel;
+    private javax.swing.JTextField ipTextField;
+    private javax.swing.JTextField portTextField;
+    private javax.swing.JTextField nameTextField;
+    private javax.swing.JButton btnLogin;
+    // End of variables declaration//GEN-END:variables
 }
