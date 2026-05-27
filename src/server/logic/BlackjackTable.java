@@ -96,8 +96,13 @@ public class BlackjackTable {
     }
 
     public boolean nameExists(String name) {
-        for (Player player : playingNow) {
-            if (player.getNome().equals(name)) {
+        for (Player p : playingNow) {
+            if (p != null && p.getNome().equals(name)) {
+                return true;
+            }
+        }
+        for (Player p : waitingQueue) {
+            if (p.getNome().equals(name)) {
                 return true;
             }
         }
