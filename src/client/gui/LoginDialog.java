@@ -83,6 +83,14 @@ public class LoginDialog extends JDialog {
         }
     }
 
+    public void loginFailed() {
+        JOptionPane.showMessageDialog(this, "Login falhou. Verifique as informações e tente novamente.");
+    }
+
+    public void loginSuccess() {
+        JOptionPane.showMessageDialog(this, "Login bem-sucedido!");
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel ipLabel;
     private javax.swing.JLabel portLabel;

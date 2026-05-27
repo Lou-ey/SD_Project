@@ -1,5 +1,6 @@
 package client.network;
 
+import client.gui.LoginDialog;
 import client.gui.TableFrame;
 
 import java.io.DataInputStream;
@@ -18,6 +19,7 @@ public class ServerConThread extends Thread {
     private boolean connected;
 
     private TableFrame tableFrame;
+    private LoginDialog loginDialog;
 
     public ServerConThread(String ip, int port) {
         this.port = port;
@@ -70,6 +72,12 @@ public class ServerConThread extends Thread {
             case "CHIPS":
                 System.out.println(command);
 
+                break;
+            case "LOGIN_FAILED":
+                loginDialog.loginFailed();
+                    break;
+            case "LOGIN_SUCCESS":
+                loginDialog.loginSuccess();
                 break;
             default:
                 tableFrame.addToTextArea(msg);

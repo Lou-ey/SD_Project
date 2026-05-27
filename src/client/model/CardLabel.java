@@ -3,15 +3,15 @@ package client.model;
 import javax.swing.*;
 
 // cada carta é apresentada num JLabel
-public class CardFrame extends JLabel{
+public class CardLabel extends JLabel{
 
-    public CardFrame(){
+    public CardLabel(){
     
     }
 
     // define o icone do label, que é a imagem da carta
     public void setCardImage (String name){
-        ImageIcon im = new ImageIcon(getClass().getResource("../cartas/"+ name + ".png"));
+        ImageIcon im = new ImageIcon(getClass().getResource("../resources/images/cards/" + name + ".png"));
         this.setIcon(im);
     }
 
