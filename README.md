@@ -1,1 +1,1 @@
-o binex é um cão fraco.
+
