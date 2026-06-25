@@ -745,7 +745,7 @@ public class TableFrame extends javax.swing.JFrame {
         }
 
         javax.swing.JOptionPane.showMessageDialog(this,
-                "Jogadores na fila de espera:\n\n" + listaFormatada.toString(),
+                "Jogadores na fila de espera:\n\n" + listaFormatada,
                 "Lista de Espetadores",
                 javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButtoneEspListaActionPerformed
