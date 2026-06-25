@@ -11,7 +11,7 @@ public class CardLabel extends JLabel{
 
     // define o icone do label, que é a imagem da carta
     public void setCardImage (String name){
-        ImageIcon im = new ImageIcon(getClass().getResource("../resources/images/cards/" + name + ".png"));
+        ImageIcon im = new ImageIcon(getClass().getResource("../images/cards/"+ name + ".png"));
         this.setIcon(im);
     }
 

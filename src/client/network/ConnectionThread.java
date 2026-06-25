@@ -1,6 +1,5 @@
 package client.network;
 
-import client.gui.LoginDialog;
 import client.gui.TableFrame;
 
 import java.io.DataInputStream;
@@ -8,20 +7,41 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-
-public class ServerConThread extends Thread {
+/**
+ * ConnectionThread
+ * Thread responsável por manter a conexão com o servidor, ler mensagens e enviar comandos.
+ */
+public class ConnectionThread extends Thread {
     private int port;
     private String ip;
     private DataOutputStream out;
     private DataInputStream in;
     private Socket socket;
 
+    private String username;
+
     private boolean connected;
 
     private TableFrame tableFrame;
-    private LoginDialog loginDialog;
+    private client.gui.LoginDialog loginDialog; //para controlar a modal 
+    
+    public void setLoginDialog(client.gui.LoginDialog login) { //passar o objeto da modal login
+        this.loginDialog = login;
+    }
 
-    public ServerConThread(String ip, int port) {
+    public void setTableFrame(TableFrame tableFrame) {
+        this.tableFrame = tableFrame;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public ConnectionThread(String ip, int port) {
         this.port = port;
         this.ip = ip;
         this.connected = false;
@@ -48,7 +68,8 @@ public class ServerConThread extends Thread {
                 processServerMessage(serverMessage);
             }
         } catch (Exception e) {
-            System.out.println("Connection lost: " + e.getMessage());
+            System.out.println("Conexao perdida: " + e.getMessage());
+
         } finally {
             disconnect();
         }
@@ -57,40 +78,49 @@ public class ServerConThread extends Thread {
     public void processServerMessage(String msg) {
         System.out.println("Server: " + msg);
 
-        String[] parts = msg.split(":");
-        String command = parts[0];
+        String[] parts = msg.split(";");
+        String command = "";
+
+        if (parts[0].startsWith("[")) {
+            command = parts[1];
+        } else {
+            command = parts[0];
+        }
 
         switch (command) {
-            case "PLAYER_CARD":
-                System.out.println(command);
 
-                break;
-            case "DEALER_CARD":
-                System.out.println(command);
-
-                break;
-            case "CHIPS":
-                System.out.println(command);
-
-                break;
-            case "LOGIN_FAILED":
-                loginDialog.loginFailed();
-                    break;
             case "LOGIN_SUCCESS":
-                loginDialog.loginSuccess();
+                System.out.println(command);
+                javax.swing.SwingUtilities.invokeLater(() -> { //meter depois no relatorio
+                        loginDialog.loginAceite(this);
+                    });
                 break;
-            default:
-                tableFrame.addToTextArea(msg);
+
+            case "LOGIN_FAILED":
+                System.out.println(command);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                        loginDialog.loginRecusado();
+                    });
                 break;
+
+            default: //se nao for logins deve ser para desenhar ou sair
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    if (tableFrame != null){
+                        tableFrame.processServerMessage(parts, msg);
+                    }
+                });
+                break; //depois mandar as mensagens "cruas" para a mesa e la fazer a filtragem la para atualizar
+
         }
     }
 
     public void sendCommand(String command) {
-        try {
-            out.writeUTF(command);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        try{
+           out.writeUTF(command);
+           out.flush();
+
+        }catch (IOException e){
+            System.out.println(e);
         }
     }
 
@@ -109,9 +139,5 @@ public class ServerConThread extends Thread {
         } catch (IOException e) {
             System.out.println("Error closing connection: " + e.getMessage());
         }
-    }
-
-    public void setTableFrame(TableFrame tableFrame) {
-        this.tableFrame = tableFrame;
     }
 }

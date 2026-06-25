@@ -1,21 +1,16 @@
 package client;
 
-import client.gui.LoginDialog;
+import client.gui.TableFrame;
 
-import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+public class ClientMain {
 
-public class ClientMain{
     public static void main(String[] args) {
-        LoginDialog loginDialog = new LoginDialog();
-
-        loginDialog.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
+        // Invoca a interface gráfica de forma segura atraves do invokeLater
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new TableFrame();
             }
         });
-
-        loginDialog.setVisible(true);
     }
 }
