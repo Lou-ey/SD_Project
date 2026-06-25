@@ -1,17 +1,16 @@
 package client;
 
-import client.network.ServerConThread;
+import client.gui.TableFrame;
 
-public class ClientMain{
-    public static void main() {
+public class ClientMain {
 
-    String ip = "localhost";
-    int porta = 4000;
-
-
-    ServerConThread serverConThread = new ServerConThread(porta, ip);
-    serverConThread.start();
-
+    public static void main(String[] args) {
+        // Invoca a interface gráfica de forma segura atraves do invokeLater
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new TableFrame();
+            }
+        });
     }
 }
-
