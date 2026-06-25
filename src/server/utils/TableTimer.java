@@ -31,7 +31,7 @@ public class TableTimer implements Runnable {
                 blackjackTable.processEndTimer(timerType);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Timer interrompido");
         }
     }
 
