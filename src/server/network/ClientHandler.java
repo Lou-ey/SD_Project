@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Queue;
 
 /**
  * Thread
@@ -32,26 +31,29 @@ public class ClientHandler implements Runnable {
 
             while(true) {
                 String message = in.readUTF();
-                System.out.println("Recebido de " + socket.getInetAddress() + ": " + message);
+                System.out.println("Received: " + message);
 
                 // o formato da mensagem é "COMMAND:DATA", onde COMMAND é a ação e DATA é o conteúdo
                 String[] parts = message.split(":", 2);
                 String command = parts[0];
 
+
                 switch (command) {
                     case "LOGIN":
                         if(parts.length < 2) {
-                            sendMessage("Error: Nome do utilizador em falta!");
+                            sendMessage("[hora];ERROR; Nome do utilizador em falta!");                            
                             break;
                         }
                         String name = parts[1];
                         boolean success = table.addPlayer(name, this);
+
                         if(success) {
                             this.username = name;
-                            sendMessage("LOGIN_SUCCESS:Bem-vindo, " + name + "!");
+                            sendMessage("[hora];LOGIN_SUCCESS;Bem-vindo, " + name + "!");
+                            table.enviarHistorico(this);//enviar so depois do login para processar as mensagens de atualizar a parte grafics
                             break;
                         } else {
-                            sendMessage("LOGIN_FAILED:Nome de utilizador já existe!");
+                            sendMessage("[hora];LOGIN_FAILED;Nome de utilizador já existe!");
                         }
                         break;
                     case "HIT":
@@ -62,6 +64,12 @@ public class ClientHandler implements Runnable {
                         System.out.println("Player " + username + " stands!");
                         table.requestStand(username);
                         break;
+
+                    case "SPECTATE":
+                        System.out.println("Player " + username + " is spectating!");
+                        table.makeSpectator(username);
+                        break;
+
                     case "LOGOUT":
                         return;
                     default:
@@ -69,15 +77,15 @@ public class ClientHandler implements Runnable {
                 }
             }
         } catch(IOException e) {
-            System.out.println("Error in client handler with client: " + username);
+            System.out.println("Error in client handler with client " + username + e.getMessage());
         } finally {
-            if (username != null) {
-                // se saiu while desconecta o cliente
-                // tratar a saida do jogador passar a observador ou remover do mesa
-                table.removePlayer(username);
-            }
+
+            table.removeClient(this);
+
             try {
-                socket.close();
+                if (socket != null && !socket.isClosed()) {
+                    socket.close();
+                }
             } catch (IOException e) {
                 System.out.println("Error closing socket for client: " + username);
             }
